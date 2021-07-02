@@ -3,6 +3,7 @@
         <Header />
         <main>
             <div class="container">
+                <div>userData: {{userData}}</div>
                 <router-link to="/account/find_id">아이디 찾기</router-link><br>
                 <router-link to="/account/find_id_result">아이디 찾기(결과화면)</router-link><br>
                 <router-link to="/account/edit_user_info">회원정보 수정</router-link><br>
@@ -17,11 +18,21 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
     export default {
         name: 'Home',
         components: {
             Header: () => import('@/components/Header.vue'),
             // Navber: () => import('@/components/navbar.vue'),
+        },
+        data: function() {
+            return {}
+        },
+        computed: {
+            ...mapState({
+                userData: state => state.userData
+            })
         }
     }
 </script>
