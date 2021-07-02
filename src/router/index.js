@@ -10,11 +10,12 @@ const routes = [
     },
     {
         path: '/account/find_id',
-        component: () => import('../views/account/FindID.vue')
+        component: () => import('../views/account/FindID.vue'),
     },
     {
+        name: 'find_id_result',
         path: '/account/find_id_result',
-        component: () => import('../views/account/FindIDResult.vue')
+        component: () => import('../views/account/FindIDResult.vue'),
     },
     {
         path: '/account/find_pw',

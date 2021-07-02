@@ -247,56 +247,56 @@ import { certBusiness } from '@/account';
                 this.isCertifiedMobile = true;
             },
             join: function() {
-                // if (!this.agreeTerms) {
-                //     alert('이용약관에 동의해주세요.');
-                //     return;
-                // }
-                // if (!this.agreePrivacy) {
-                //     alert('개인정보 수집 및 이용에 동의해주세요.');
-                //     return;
-                // }
-                // if (!this.isCertifiedBusiness) {
-                //     alert('사업자 실명인증을 완료해주세요.');
-                //     return;
-                // }
-                // if (!this.isCertifiedEmail) {
-                //     alert('이메일 인증을 완료해주세요.');
-                //     return;
-                // }
-                // if (this.password && this.pwConfirm) {
-                //     if (!this.regExpPassword.test(this.password)) {
-                //         alert('비밀번호는 영문, 숫자, 특수문자 포함 8~20자를 입력해주세요.');
-                //         return;
-                //     }
-                //     if (!this.regExpPassword.test(this.pwConfirm)) {
-                //         alert('비밀번호는 영문, 숫자, 특수문자 포함 8~20자를 입력해주세요.');
-                //         return;
-                //     }
-                //     if (this.password != this.pwConfirm) {
-                //         alert('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
-                //         return;
-                //     }
-                // } else if (!this.password) {
-                //     alert('비밀번호를 입력해주세요.');
-                //     return;
-                // } else if (!this.pwConfirm) {
-                //     alert('비밀번호 확인을 입력해주세요.');
-                //     return;
-                // }
-                // if (!this.name) {
-                //     alert('이름을 입력해주세요.');
-                //     return;
-                // }
-                // if (!this.isCertifiedMobile) {
-                //     alert('휴대폰 인증을 완료해주세요.');
-                //     return;
-                // }
+                if (!this.agreeTerms) {
+                    alert('이용약관에 동의해주세요.');
+                    return;
+                }
+                if (!this.agreePrivacy) {
+                    alert('개인정보 수집 및 이용에 동의해주세요.');
+                    return;
+                }
+                if (!this.isCertifiedBusiness) {
+                    alert('사업자 실명인증을 완료해주세요.');
+                    return;
+                }
+                if (!this.isCertifiedEmail) {
+                    alert('이메일 인증을 완료해주세요.');
+                    return;
+                }
+                if (this.password && this.pwConfirm) {
+                    if (!this.regExpPassword.test(this.password)) {
+                        alert('비밀번호는 영문, 숫자, 특수문자 포함 8~20자를 입력해주세요.');
+                        return;
+                    }
+                    if (!this.regExpPassword.test(this.pwConfirm)) {
+                        alert('비밀번호는 영문, 숫자, 특수문자 포함 8~20자를 입력해주세요.');
+                        return;
+                    }
+                    if (this.password != this.pwConfirm) {
+                        alert('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+                        return;
+                    }
+                } else if (!this.password) {
+                    alert('비밀번호를 입력해주세요.');
+                    return;
+                } else if (!this.pwConfirm) {
+                    alert('비밀번호 확인을 입력해주세요.');
+                    return;
+                }
+                if (!this.name) {
+                    alert('이름을 입력해주세요.');
+                    return;
+                }
+                if (!this.isCertifiedMobile) {
+                    alert('휴대폰 인증을 완료해주세요.');
+                    return;
+                }
 
                 var formData = new FormData();
                 formData.append("companyName", this.bsnTitle);
-                formData.append("companyRegnum", this.bsnNum);
+                formData.append("companyRegnum", this.bsnNum.replace(/[^\d]/ig, ""));
                 formData.append("emailId", this.email);
-                formData.append("mobileTelno", this.mobile);
+                formData.append("mobileTelno", this.mobile.replace(/[^\d]/ig, ""));
                 formData.append("userName", this.name);
                 formData.append("userPwd", this.password);
 
@@ -313,9 +313,16 @@ import { certBusiness } from '@/account';
                     if (res.status == 200 || res.status == 204) {
                         alert('회원가입이 완료되었습니다.');
                         this.$router.push('/account/login');
-                    } else if (res.status == 400) {
-                        alert(`${res.message}`);
-                    } else if (res.status == 500) {
+                    } else {
+                        const err = new Error();
+                        err.response = res;
+                        throw err;
+                    }
+                })
+                .catch(err => {
+                    if (err.response.data.status == 400) {
+                        alert(`${err.response.data.message}`);
+                    } else if (err.response.data.status == 500) {
                         alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                     }
                 })

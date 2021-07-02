@@ -7,7 +7,7 @@
                     <h4>고객님의 아이디 찾기가 완료되었습니다.</h4>
                     <dl class="d-flex mb-0 justify-content-center">
                         <dt>아이디</dt>
-                        <dd class="mb-0">tsc*******@email.com</dd>
+                        <dd class="mb-0">{{$route.params.emailId}}</dd>
                     </dl>
                 </div>
                 <form @submit.prevent="submit">
@@ -35,6 +35,12 @@
     export default {
         components: {
             Header: () => import('@/components/Header.vue'),
+        },
+        props: {},
+        created: function() {
+            // console.log('emailId => ', this.emailId)
+            console.log(this, this.$route)
+            console.log('this.$route.params.emailId => ', this.$route.params.emailId)
         },
         methods: {
             submit: function() {
