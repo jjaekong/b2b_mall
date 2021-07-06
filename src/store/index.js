@@ -8,7 +8,7 @@ export default new Vuex.Store({
         userData: null,
     },
     mutations: {
-        setUser(state, payload) {
+        setUserData(state, payload) {
             state.userData = payload;
         }
     },

@@ -6,11 +6,11 @@
                 <form @submit.prevent="login">
                     <div class="mb-4">
                         <label for="email" class="form-label mb-1">아이디 (이메일)</label>
-                        <input type="email" class="form-control" id="email" placeholder="email@address.com" required v-model="email">
+                        <input type="email" class="form-control" id="email" placeholder="email@address.com" v-model="email">
                     </div>
                     <div class="mb-4">
                         <label for="password" class="form-label mb-1">비밀번호</label>
-                        <input type="password" class="form-control" id="password" placeholder="●●●●●●●●●●" autocomplete="false" required v-model="password">
+                        <input type="password" class="form-control" id="password" placeholder="●●●●●●●●●●" autocomplete="false" v-model="password">
                     </div>
                     <div class="btn-row">
                         <button type="submit" class="btn btn-lg btn-primary w-100 rounded-0 fw-bolder">로그인</button>
@@ -62,12 +62,17 @@ import axios from 'axios';
                 })
                 .then(res => {
                     if (res.status == 200) {
-                        this.$store.commit('setUser', res.data);
-                        // 2단계 인증 사용여부에 따라 페이지 이동
-                        if (res.data.towFactorAuthCode == "NONE") { // 사용안함: 메인페이지 이동
-                            this.$router.push('/');
-                        } else { // 사용함: 2단계 인증페이지로 이동
-                            this.$router.push('/account/cert');
+                        this.$store.commit('setUserData', res.data);
+                        // 임시 비밀번호를 발급받은 사용자
+                        if (res.data.temppwdYn == 'Y') {
+                            this.$router.push('/account/reset_pw');
+                        } else {
+                            // 2단계 인증 사용여부에 따라 페이지 이동
+                            if (res.data.towFactorAuthCode == "NONE") { // 사용안함: 메인페이지 이동
+                                this.$router.push('/');
+                            } else { // 사용함: 2단계 인증페이지로 이동
+                                this.$router.push('/account/cert');
+                            }
                         }
                     } else {
                         const err = new Error();

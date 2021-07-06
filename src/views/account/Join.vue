@@ -200,9 +200,16 @@ import { certBusiness } from '@/account';
                             }
                         }, 1000);
                         alert('입력하신 이메일 주소로 인증번호가 발송되었습니다');
-                    } else if (res.status == 400) {
-                        alert(`${res.message}`);
-                    } else if (res.status == 500) {
+                    } else {
+                        const err = new Error();
+                        err.response = res;
+                        throw err;
+                    }
+                })
+                .catch(err => {
+                    if (err.response.data.status == 400) {
+                        alert(`${err.response.data.message}`);
+                    } else if (err.response.data.status == 500) {
                         alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                     }
                 })
@@ -226,7 +233,6 @@ import { certBusiness } from '@/account';
                 })
                 .then(res => {
                     if (res.status == 200 || res.status == 204) {
-                        this.isCertifiedEmail = true;
                         // 타이머 정지
                         clearInterval(this.certNumTimer);
                         // 타이머 감추기
@@ -234,9 +240,16 @@ import { certBusiness } from '@/account';
                         // 인증여부 저장
                         this.isCertifiedEmail = true;
                         alert('이메일 인증이 완료되었습니다.');
-                    } else if (res.status == 400) {
-                        alert(`${res.message}`);
-                    } else if (res.status == 500) {
+                    } else {
+                        const err = new Error();
+                        err.response = res;
+                        throw err;
+                    }
+                })
+                .catch(err => {
+                    if (err.response.data.status == 400) {
+                        alert(`${err.response.data.message}`);
+                    } else if (err.response.data.status == 500) {
                         alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                     }
                 })
@@ -303,7 +316,7 @@ import { certBusiness } from '@/account';
                 // 가입절차 진행
                 axios({
                     method: 'post',
-                    url: 'https://tmall-backend.coufun.kr/signUp/manager',
+                    url: 'https://tmall-backend.coufun.kr/sign-up/manager',
                     data: formData,
                     headers: {
                         "Content-Type": "multipart/form-data; charset=UTF-8"
@@ -408,7 +421,7 @@ import { certBusiness } from '@/account';
 }
 #cert-limit {
     display: none;
-    bottom: 0.375rem;
+    bottom: 0.2rem;
     right: 110px;
     line-height: 2;
     color: #f58220;

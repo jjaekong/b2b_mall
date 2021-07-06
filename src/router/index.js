@@ -34,12 +34,16 @@ const routes = [
         component: () => import('../views/account/Cert.vue')
     },
     {
-        path: '/account/invitation',
-        component: () => import('../views/account/Invitation.vue')
+        path: '/account/invite',
+        component: () => import('../views/account/Invite.vue')
     },
     {
         path: '/account/join',
         component: () => import('../views/account/Join.vue')
+    },
+    {
+        path: '/account/reset_pw',
+        component: () => import('../views/account/ResetPW.vue')
     },
 ]
 

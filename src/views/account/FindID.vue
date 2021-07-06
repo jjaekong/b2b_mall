@@ -6,11 +6,11 @@
                 <form @submit.prevent="findId">
                     <div class="mb-4">
                         <label for="name" class="form-label mb-1">이름</label>
-                        <input type="text" class="form-control" id="name" placeholder="홍길동" required v-model="name">
+                        <input type="text" class="form-control" id="name" placeholder="홍길동" v-model="name">
                     </div>
                     <div class="mb-4">
                         <label for="phone" class="form-label mb-1">휴대폰 번호</label>
-                        <input type="text" class="form-control" id="phone" placeholder="010-0000-0000" required v-model="mobile">
+                        <input type="text" class="form-control" id="phone" placeholder="010-0000-0000" v-model="mobile">
                     </div>
                     <div class="row btn-row">
                         <div class="col col-4">

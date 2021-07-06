@@ -9,9 +9,10 @@
                 <router-link to="/account/edit_user_info">회원정보 수정</router-link><br>
                 <router-link to="/account/login">로그인</router-link><br>
                 <router-link to="/account/cert">2단계 인증</router-link><br>
-                <router-link to="/account/invitation">회원가입 초대</router-link><br>
+                <router-link to="/account/invite">회원가입 초대</router-link><br>
                 <router-link to="/account/find_pw">비밀번호 찾기</router-link><br>
                 <router-link to="/account/join">회원가입</router-link><br>
+                <router-link to="/account/reset_pw">비밀번호 재설정</router-link><br>
                 <div><button @click="deleteAllUsers">전체 사용자 삭제</button></div>
             </div>
         </main>
