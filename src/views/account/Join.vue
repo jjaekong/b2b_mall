@@ -23,13 +23,13 @@
                 </div>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#business-title" type="button"><span>기업 실명인증</span></button>
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#business-license" type="button"><span>사업자등록증 업로드</span></button>
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#business-title" type="button" @click="selectJoinType('business-title')"><span>기업 실명인증</span></button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#business-license" type="button" @click="selectJoinType('business-license')"><span>사업자등록증 업로드</span></button>
                     </div>
                 </nav>
                 <form @submit.prevent="join">
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show active" id="business-title">
+                        <div class="tab-pane show active" id="business-title">
                             <div class="mb-4">
                                 <label for="bsn-title" class="form-label mb-1">상호명</label>
                                 <input type="text" class="form-control" id="bsn-title" placeholder="티사이언티픽" v-model="bsnTitle" :disabled="isCertifiedBusiness">
@@ -40,10 +40,10 @@
                                 <button class="btn btn-sm position-absolute" @click.prevent="certBsnNum" :disabled="isCertifiedBusiness">사업자 실명인증</button>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="business-license">
+                        <div class="tab-pane" id="business-license">
                             <div class="mb-4">
                                 <label for="bsn-file" class="form-label mb-1">사업자등록증(pdf, jpg)</label>
-                                <input type="file" class="form-control" id="bsn-file" placeholder="티사이언티픽">
+                                <input type="file" class="form-control" id="bsn-file" placeholder="티사이언티픽" @input="selectBsnFile">
                             </div>
                         </div>
                     </div>
@@ -94,6 +94,7 @@
 <script>
 import axios from "axios";
 import { certBusiness } from '@/account';
+import { bootstrap }  from 'bootstrap';
 
     export default {
         components: {
@@ -103,6 +104,7 @@ import { certBusiness } from '@/account';
         },
         data: function() {
             return {
+                joinType: "business-title", // 가입 방식(기업 실명인증 or 사업자 등록증 업로드)
                 agreeTerms: true,           // 이용약관 동의
                 agreePrivacy: true,         // 개인정보수집 동의
                 bsnTitle: null,             // 상호명
@@ -132,6 +134,25 @@ import { certBusiness } from '@/account';
             }
         },
         methods: {
+            selectJoinType: function(typeName) {
+                this.joinType = typeName;
+            },
+            selectBsnFile: function(event) {
+                if (event.target.files.length > 0) {
+                    const file = event.target.files[0];
+                    const fileExt = file.type.split("/")[1];
+                    if (/jpg|jpeg|pdf/gi.test(fileExt)) {
+                        this.bsnFile = event.target.files[0];
+                    } else {
+                        alert("pdf, jpg 파일만 업로드 가능합니다.");
+                        event.target.value = "";
+                        this.bsnFile = null;
+                    }
+                } else {
+                    event.target.value = "";
+                    this.bsnFile = null;
+                }
+            },
             certBsnNum: function() {
                 if (!this.bsnTitle) {
                     alert('상호명을 입력해주세요.');
@@ -139,12 +160,12 @@ import { certBusiness } from '@/account';
                     return;
                 }
                 if (!this.bsnNum) {
-                    alert('사업자등록번호 10자리를 입력해 주세요.');
+                    alert('사업자등록번호 10자리를 입력해주세요.');
                     document.querySelector('#bsn-num').focus();
                     return;
                 }
                 if (!this.regExpBsnNum.test(this.bsnNum)) {
-                    alert('사업자등록번호 10자리를 형식에 맞게 입력해 주세요.');
+                    alert('사업자등록번호 10자리를 형식에 맞게 입력해주세요.');
                     document.querySelector('#bsn-num').focus();
                     return;
                 }
@@ -165,7 +186,7 @@ import { certBusiness } from '@/account';
                     return;
                 }
                 if (!this.regExpEmail.test(this.email)) {
-                    alert('이메일주소를 양식에 맞게 입력해 주세요.');
+                    alert('이메일주소를 양식에 맞게 입력해주세요.');
                     document.querySelector('#email').focus();
                     return;
                 }
@@ -268,9 +289,22 @@ import { certBusiness } from '@/account';
                     alert('개인정보 수집 및 이용에 동의해주세요.');
                     return;
                 }
-                if (!this.isCertifiedBusiness) {
-                    alert('사업자 실명인증을 완료해주세요.');
-                    return;
+                if (this.joinType == 'business-title') {
+                    if (!this.isCertifiedBusiness) {
+                        alert('사업자 실명인증을 완료해주세요.');
+                        return;
+                    }
+                } else if (this.joinType == 'business-license') {
+                    if (this.bsnFile) {
+                        const fileExt = this.bsnFile.type.split("/")[1];
+                        if (!/jpg|jpeg|pdf/gi.test(fileExt)) {
+                            alert("pdf, jpg 파일만 업로드 가능합니다.");
+                            return;
+                        }
+                    } else {
+                        alert('사업자등록증을 업로드해주세요.');
+                        return;
+                    }
                 }
                 if (!this.isCertifiedEmail) {
                     alert('이메일 인증을 완료해주세요.');
@@ -306,8 +340,12 @@ import { certBusiness } from '@/account';
                 }
 
                 var formData = new FormData();
-                formData.append("companyName", this.bsnTitle);
-                formData.append("companyRegnum", this.bsnNum.replace(/[^\d]/ig, ""));
+                if (this.joinType == 'business-title') {
+                    formData.append("companyName", this.bsnTitle);
+                    formData.append("companyRegnum", this.bsnNum.replace(/[^\d]/ig, ""));
+                } else if (this.joinType == 'business-license') {
+                    formData.append("companyRegFile", this.bsnFile);
+                }
                 formData.append("emailId", this.email);
                 formData.append("mobileTelno", this.mobile.replace(/[^\d]/ig, ""));
                 formData.append("userName", this.name);
@@ -428,5 +466,8 @@ import { certBusiness } from '@/account';
 }
 .btn-row {
     margin-top: 30px;
+}
+#bsn-file {
+    appearance: none;
 }
 </style>

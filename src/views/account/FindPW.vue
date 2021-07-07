@@ -67,12 +67,12 @@ import axios from 'axios';
                     return;
                 }
                 if (!this.regExpEmail.test(this.email)) {
-                    alert('이메일주소를 양식에 맞게 입력해 주세요.');
+                    alert('이메일주소를 양식에 맞게 입력해주세요.');
                     document.querySelector('#email').focus();
                     return;
                 }
                 if (!this.regExpMobile.test(this.mobile)) {
-                    alert('휴대폰번호를 양식에 맞게 입력해 주세요.');
+                    alert('휴대폰번호를 양식에 맞게 입력해주세요.');
                     document.querySelector('#mobile').focus();
                     return;
                 }
@@ -147,12 +147,12 @@ import axios from 'axios';
             },
             findPw: function() {
                 if (!this.regExpEmail.test(this.email)) {
-                    alert('이메일주소를 양식에 맞게 입력해 주세요.');
+                    alert('이메일주소를 양식에 맞게 입력해주세요.');
                     document.querySelector('#email').focus();
                     return;
                 }
                 if (!this.certNum) {
-                    alert('인증번호를 입력해 주세요.');
+                    alert('인증번호를 입력해주세요.');
                     document.querySelector('#cert-num').focus();
                     return;
                 }

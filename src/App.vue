@@ -25,7 +25,7 @@ body {
     padding-right: 20px;
     padding-left: 20px;
 }
-.form-control {
+.form-control:not([type="file"]) {
     box-shadow: none !important;
     border-radius: 0;
     border-color: #333 !important;
@@ -36,6 +36,15 @@ body {
     padding-right: 0;
     font-size: 15px;
     font-weight: 800 !important;
+    &::placeholder {
+        color: #827878 !important;
+    }
+}
+.form-control[type="file"] {
+    border-radius: 0;
+    font-size: 15px;
+    font-weight: 800 !important;
+    border-color: #333;
     &::placeholder {
         color: #827878 !important;
     }

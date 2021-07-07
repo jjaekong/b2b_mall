@@ -10,20 +10,20 @@
                         <dd class="mb-0">{{$route.params.emailId}}</dd>
                     </dl>
                 </div>
-                <form @submit.prevent="submit">
+                <form @submit.prevent="login">
                     <div class="mb-4">
                         <label for="email" class="form-label mb-1">아이디</label>
-                        <input type="email" class="form-control" id="email" placeholder="email@address.com">
+                        <input type="email" class="form-control" id="email" placeholder="email@address.com" v-model="email">
                     </div>
                     <div class="mb-4">
                         <label for="password" class="form-label mb-1">비밀번호</label>
-                        <input type="password" class="form-control" id="password" placeholder="●●●●●●●●●●" autocomplete="false">
+                        <input type="password" class="form-control" id="password" placeholder="●●●●●●●●●●" autocomplete="false" v-model="password">
                     </div>
                     <div class="btn-row">
-                        <button class="btn btn-lg btn-primary w-100 rounded-0 fw-bolder">로그인</button>
+                        <button type="submit" class="btn btn-lg btn-primary w-100 rounded-0 fw-bolder">로그인</button>
                     </div>
                     <div class="find-pw">
-                        <router-link to="/account/find_password">비밀번호 찾기</router-link>
+                        <router-link to="/account/find_pw">비밀번호 찾기</router-link>
                     </div>
                 </form>
             </div>
@@ -32,19 +32,76 @@
 </template>
 
 <script>
+import axios from 'axios';
+
     export default {
+        beforeRouteEnter (to, from, next) {
+            if (to.params.emailId) {
+                next();
+            } else {
+                next(vm => {
+                    vm.$router.replace("/account/find_id");
+                });
+            }
+        },
         components: {
             Header: () => import('@/components/Header.vue'),
         },
-        props: {},
-        created: function() {
-            // console.log('emailId => ', this.emailId)
-            console.log(this, this.$route)
-            console.log('this.$route.params.emailId => ', this.$route.params.emailId)
+        data: function() {
+            return {
+                regExpEmail: /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i, // 이메일 정규식
+                email: null,
+                password: null,
+            }
         },
         methods: {
-            submit: function() {
-                alert('로그인')
+            login: function() {
+                if (!this.regExpEmail.test(this.email)) {
+                    alert('아이디를 이메일 양식에 맞게 입력해주세요.');
+                    return;
+                }
+                if (!this.password) {
+                    alert('비밀번호를 입력해주세요.');
+                    return;
+                }
+                axios({
+                    method: "post",
+                    url: "https://tmall-backend.coufun.kr/login",
+                    data: {
+                        "emailId": this.email,
+                        "userPwd": this.password
+                    },
+                    header: {
+                        "Content-Type": "application/json; charset=UTF-8"
+                    }
+                })
+                .then(res => {
+                    if (res.status == 200) {
+                        this.$store.commit('setUserData', res.data);
+                        // 임시 비밀번호를 발급받은 사용자
+                        if (res.data.temppwdYn == 'Y') {
+                            this.$router.push('/account/reset_pw');
+                        } else {
+                            // 2단계 인증 사용여부에 따라 페이지 이동
+                            if (res.data.towFactorAuthCode == "NONE") { // 사용안함: 메인페이지 이동
+                                this.$router.push('/');
+                            } else { // 사용함: 2단계 인증페이지로 이동
+                                this.$router.push('/account/cert');
+                            }
+                        }
+                    } else {
+                        const err = new Error();
+                        err.response = res;
+                        throw err;
+                    }
+                })
+                .catch(err => {
+                    if (err.response.data.status == 400) {
+                        alert(`${err.response.data.message}`);
+                    } else if (err.response.data.status == 500) {
+                        alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                    }
+                })
             }
         }
     }
