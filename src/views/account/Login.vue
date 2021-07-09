@@ -62,16 +62,23 @@ import axios from 'axios';
                 })
                 .then(res => {
                     if (res.status == 200) {
-                        this.$store.commit('setUserData', res.data);
+                        // this.$store.commit('setUserData', res.data);
+                        // todo: 휴면계정 페이지 이동
                         // 임시 비밀번호를 발급받은 사용자
                         if (res.data.temppwdYn == 'Y') {
                             this.$router.push('/account/reset_pw');
                         } else {
                             // 2단계 인증 사용여부에 따라 페이지 이동
                             if (res.data.towFactorAuthCode == "NONE") { // 사용안함: 메인페이지 이동
+                                this.$store.commit('setUserData', res.data);
                                 this.$router.push('/');
                             } else { // 사용함: 2단계 인증페이지로 이동
-                                this.$router.push('/account/cert');
+                                // this.$router.push('/account/added_cert');
+                                this.$router.push({
+                                    name: 'added_cert',
+                                    params: { userData: res.data }
+                                });
+                                
                             }
                         }
                     } else {
@@ -81,11 +88,14 @@ import axios from 'axios';
                     }
                 })
                 .catch(err => {
-                    if (err.response.data.status == 400) {
+                    if (err &&
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.status &&
+                        err.response.data.status == 400) {
                         alert(`${err.response.data.message}`);
-                    } else if (err.response.data.status == 500) {
-                        alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                     }
+                    alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                 })
             }
         }

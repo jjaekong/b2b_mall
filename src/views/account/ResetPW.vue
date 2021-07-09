@@ -85,11 +85,14 @@ import { mapState } from 'vuex'
                     }
                 })
                 .catch(err => {
-                    if (err.response.data.status == 400) {
+                    if (err &&
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.status &&
+                        err.response.data.status == 400) {
                         alert(`${err.response.data.message}`);
-                    } else if (err.response.data.status == 500) {
-                        alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                     }
+                    alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                 })
             }
         }
