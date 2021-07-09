@@ -62,23 +62,29 @@ import axios from 'axios';
                 })
                 .then(res => {
                     if (res.status == 200) {
-                        // this.$store.commit('setUserData', res.data);
-                        // todo: 휴면계정 페이지 이동
-                        // 임시 비밀번호를 발급받은 사용자
-                        if (res.data.temppwdYn == 'Y') {
-                            this.$router.push('/account/reset_pw');
-                        } else {
-                            // 2단계 인증 사용여부에 따라 페이지 이동
-                            if (res.data.towFactorAuthCode == "NONE") { // 사용안함: 메인페이지 이동
-                                this.$store.commit('setUserData', res.data);
-                                this.$router.push('/');
-                            } else { // 사용함: 2단계 인증페이지로 이동
-                                // this.$router.push('/account/added_cert');
-                                this.$router.push({
-                                    name: 'added_cert',
-                                    params: { userData: res.data }
-                                });
-                                
+                        // 휴면 계정 여부
+                        if (res.data.drmncyUserYn == 'Y') {
+                            this.$router.push({
+                                name: 'wake_up',
+                                params: { userData: res.data }
+                            })
+                        } else {    
+                            // 임시 비밀번호를 발급받은 사용자
+                            if (res.data.temppwdYn == 'Y') {
+                                this.$router.push('/account/reset_pw');
+                            } else {
+                                // 2단계 인증 사용여부에 따라 페이지 이동
+                                if (res.data.towFactorAuthCode == "NONE") { // 사용안함: 메인페이지 이동
+                                    this.$store.commit('setUserData', res.data);
+                                    this.$router.push('/');
+                                } else { // 사용함: 2단계 인증페이지로 이동
+                                    // this.$router.push('/account/added_cert');
+                                    this.$router.push({
+                                        name: 'added_cert',
+                                        params: { userData: res.data }
+                                    });
+                                    
+                                }
                             }
                         }
                     } else {

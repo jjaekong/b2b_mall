@@ -36,7 +36,11 @@ import axios from 'axios'
         beforeRouteEnter(to, from, next) {
             if (to.params.userData) {
                 next(vm => {
-                    vm.userData = to.params.userData
+                    if (to.params.userData.towFactorAuthCode == 'NONE') {
+                        vm.$router.replace("/account/login");
+                    } else {
+                        vm.userData = to.params.userData
+                    }
                 });
             } else {
                 next(vm => {

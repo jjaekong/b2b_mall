@@ -48,6 +48,7 @@ const routes = [
         component: () => import('../views/account/ResetPW.vue')
     },
     {
+        name: 'wake_up',
         path: '/account/wake_up',
         component: () => import('../views/account/WakeUp.vue')
     },

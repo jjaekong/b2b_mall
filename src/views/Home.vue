@@ -8,7 +8,8 @@
                 <router-link to="/account/find_id_result">아이디 찾기(결과화면)</router-link><br>
                 <router-link to="/account/edit_user_info">회원정보 수정</router-link><br>
                 <router-link to="/account/login">로그인</router-link><br>
-                <router-link to="/account/cert">2단계 인증</router-link><br>
+                <router-link to="/account/added_cert">2단계 인증</router-link><br>
+                <router-link to="/account/wake_up">휴면계정 해제</router-link><br>
                 <router-link to="/account/invite">회원가입 초대</router-link><br>
                 <router-link to="/account/find_pw">비밀번호 찾기</router-link><br>
                 <router-link to="/account/join">회원가입</router-link><br>
@@ -24,7 +25,6 @@ import axios from 'axios';
 import { mapState } from 'vuex';
 
     export default {
-        name: 'Home',
         components: {
             Header: () => import('@/components/Header.vue'),
             // Navber: () => import('@/components/navbar.vue'),
