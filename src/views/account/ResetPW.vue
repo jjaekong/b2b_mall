@@ -91,6 +91,7 @@ import { mapState } from 'vuex'
                         err.response.data.status &&
                         err.response.data.status == 400) {
                         alert(`${err.response.data.message}`);
+                        return;
                     }
                     alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                 })

@@ -109,9 +109,10 @@ import axios from 'axios'
                         err.response.data.status &&
                         err.response.data.status == 400) {
                         alert(`${err.response.data.message}`);
+                        this.$router.back();
+                        return;
                     }
                     alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-                    // 인증번호 발송 오류 시, 뒤로가기
                     this.$router.back();
                 })
             },
@@ -148,11 +149,15 @@ import axios from 'axios'
                     }
                 })
                 .catch(err => {
-                    if (err.response.data.status == 400) {
+                    if (err &&
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.status &&
+                        err.response.data.status == 400) {
                         alert(`${err.response.data.message}`);
-                    } else if (err.response.data.status == 500) {
-                        alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                        return;
                     }
+                    alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                 })
             }
         }
