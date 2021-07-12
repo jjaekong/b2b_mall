@@ -11,8 +11,8 @@
                 </div>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#cert-email" type="button"><span>이메일 인증</span></button>
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#cert-mobile" type="button"><span>휴대폰 인증</span></button>
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#cert-email" type="button" @click="selectCertType('email')"><span>이메일 인증</span></button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#cert-mobile" type="button" @click="selectCertType('mobile')"><span>휴대폰 인증</span></button>
                     </div>
                 </nav>
                 <form @submit.prevent="wakeUp">
@@ -20,15 +20,15 @@
                         <div class="tab-pane show active" id="cert-email">
                             <div class="mb-4 position-relative">
                                 <label for="email" class="form-label mb-1">아이디(이메일)</label>
-                                <input type="email" class="form-control" id="email" placeholder="gdhong@tscientific.co.kr" v-model="email">
-                                <button class="btn btn-sm position-absolute" @click.prevent="sendCertNum('email')">인증번호 발송</button>
+                                <input type="email" class="form-control" id="email" placeholder="gdhong@tscientific.co.kr" v-model="email" readonly>
+                                <button class="btn btn-sm position-absolute" @click.prevent="sendCertNum">인증번호 발송</button>
                             </div>
                         </div>
                         <div class="tab-pane" id="cert-mobile">
                             <div class="mb-4 position-relative">
                                 <label for="mobile" class="form-label mb-1">휴대폰번호</label>
-                                <input type="text" class="form-control" id="mobile" placeholder="010-1234-4567" v-model="mobile">
-                                <button class="btn btn-sm position-absolute" @click.prevent="sendCertNum('mobile')">인증번호 발송</button>
+                                <input type="text" class="form-control" id="mobile" placeholder="010-1234-4567" v-model="mobile" readonly>
+                                <button class="btn btn-sm position-absolute" @click.prevent="sendCertNum">인증번호 발송</button>
                             </div>
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                     </div>
                     <div class="row btn-row">
                         <div class="col col-4">
-                            <button class="btn btn-lg btn-secondary w-100 rounded-0 fw-bolder" @click="goBack">취소</button>
+                            <button class="btn btn-lg btn-secondary w-100 rounded-0 fw-bolder" @click="cancel">취소</button>
                         </div>
                         <div class="col col-8">
                             <button type="submit" class="btn btn-lg btn-primary w-100 rounded-0 fw-bolder">휴면해제</button>
@@ -52,12 +52,16 @@
 </template>
 
 <script>
+import axios from 'axios';
+
     export default {
         beforeRouteEnter(to, from, next) {
             if (to.params.userData) {
                 next(vm => {
                     if (to.params.userData.drmncyUserYn == 'Y') {
-                        vm.userData = to.params.userData
+                        vm.userNo = to.params.userData.userNo;
+                        vm.email = to.params.userData.emailId;
+                        vm.mobile = to.params.userData.mobileTelno;
                     } else {
                         vm.$router.replace("/account/login");
                     }
@@ -73,11 +77,14 @@
         },
         data: function() {
             return {
+                certType: 'email',
+                userNo: null,
                 email: null,
                 mobile: null,
                 certNum: null,
                 certNumTimer: null,
-                certNumTimeLimit: 180
+                certNumTimeLimit: 180,
+                regExpMobile: /^(\d{3}-\d{3,4}-\d{4}|\d{10,11})$/, // 휴대전화번호 정규식
             }
         },
         computed: {
@@ -86,14 +93,113 @@
             }
         },
         methods: {
-            goBack: function() {
-                this.$router.back();
+            cancel: function() {
+                if (confirm('취소 시 입력된 정보는 저장되지 않습니다. 휴면해제를 취소하시겠습니까?')) {
+                    this.$router.back();
+                }
+            },
+            selectCertType: function(certType) {
+                this.certType = certType;
             },
             wakeUp: function() {
-                console.log('휴면해제')
+                
+                if (!this.certNum) {
+                    alert('인증번호를 입력해주세요.');
+                    document.querySelector('#cert-num').focus();
+                    return;
+                }
+
+                axios({
+                    method: 'DELETE',
+                    url: `https://tmall-backend.coufun.kr/drmncy/${this.userNo}`,
+                    data: {
+                        "authKey": this.certType == 'email' ? this.email : this.certType == 'mobile' ? this.mobile : null,
+                        "authNo": this.certNum
+                    }
+                })
+                .then(res => {
+                    if (res.status == 200 || res.status == 204) {
+                        // 타이머 정지
+                        clearInterval(this.certNumTimer);
+                        // 타이머 감추기
+                        document.querySelector('#cert-limit').style.display = 'none';
+                        alert('계정 휴면이 해제되었습니다.');
+                        this.$router.push('/account/login');
+                    } else {
+                        const err = new Error();
+                        err.response = res;
+                        throw err;        
+                    }
+                })
+                .catch(err => {
+                    if (err &&
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.status &&
+                        err.response.data.status == 400) {
+                        alert(`${err.response.data.message}`);
+                        return;
+                    }
+                    alert('오류가 발생했습니다.1 잠시 후 다시 시도해주세요.');
+                })
+
             },
-            sendCertNum: function(certType) {
-                alert(`인증번호 발송 ${certType}`);
+            sendCertNum: function() {
+
+                // 타이머가 있다면 초기화
+                if (this.certNumTimer) {
+                    clearInterval(this.certNumTimer);
+                }
+
+                // 타이머 제한시간 리셋
+                this.certNumTimeLimit = 180;
+
+                axios({
+                    method: "POST",
+                    url: "https://tmall-backend.coufun.kr/auth/send",
+                    data: {
+                        "authKey": this.certType == 'email' ? this.email : this.certType == 'mobile' ? this.mobile : null,
+                        "authReqCode": "DRMNCY_CANCEL"
+                    }
+                })
+                .then(res => {
+                    if (res.status == 200 || res.status == 204) {
+
+                        // 제한 시간 보이기
+                        document.querySelector('#cert-limit').style.display = 'block';
+                        // 타이머 시작
+                        this.certNumTimer = setInterval(() => {
+                            if (this.certNumTimeLimit > 0) {
+                                this.certNumTimeLimit--;
+                            } else {
+                                clearInterval(this.certNumTimer);
+                            }
+                        }, 1000);
+
+                        if (this.certType == 'email') {
+                            alert('고객님의 이메일 주소로 인증번호가 발송되었습니다.');
+                        } else if (this.certType == 'mobile') {
+                            alert('고객님의 휴대폰 번호로 인증번호가 발송되었습니다.');
+                        } else {
+                            alert('인증번호가 발송되었습니다.');
+                        }
+                    } else {
+                        const err = new Error();
+                        err.response = res;
+                        throw err;
+                    }
+                })
+                .catch(err => {
+                    if (err &&
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.status &&
+                        err.response.data.status == 400) {
+                        alert(`${err.response.data.message}`);
+                        return;
+                    }
+                    alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                })
             }
         }
     }
