@@ -36,6 +36,7 @@ const routes = [
         component: () => import('../views/account/AddedCert.vue')
     },
     {
+        name: 'invite_user',
         path: '/account/invite',
         component: () => import('../views/account/Invite.vue')
     },

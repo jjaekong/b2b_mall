@@ -10,7 +10,7 @@
                 <router-link to="/account/login">로그인</router-link><br>
                 <router-link to="/account/added_cert">2단계 인증</router-link><br>
                 <router-link to="/account/wake_up">휴면계정 해제</router-link><br>
-                <router-link to="/account/invite">회원가입 초대</router-link><br>
+                <router-link :to="{ name: 'invite_user', params: { userData: userData }}">회원가입 초대</router-link><br>
                 <router-link to="/account/find_pw">비밀번호 찾기</router-link><br>
                 <router-link to="/account/join">회원가입</router-link><br>
                 <router-link to="/account/reset_pw">비밀번호 재설정</router-link><br>

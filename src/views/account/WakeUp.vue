@@ -84,7 +84,6 @@ import axios from 'axios';
                 certNum: null,
                 certNumTimer: null,
                 certNumTimeLimit: 180,
-                regExpMobile: /^(\d{3}-\d{3,4}-\d{4}|\d{10,11})$/, // 휴대전화번호 정규식
             }
         },
         computed: {
