@@ -13,6 +13,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 $grid-gutter-width: 4px;
 @import "~bootstrap/scss/bootstrap";
 body {

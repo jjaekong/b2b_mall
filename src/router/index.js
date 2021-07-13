@@ -9,6 +9,10 @@ const routes = [
         component: () => import('../views/Home.vue')
     },
     {
+        path: '/filelist',
+        component: () => import('../views/FileList.vue')
+    },
+    {
         path: '/account/find_id',
         component: () => import('../views/account/FindID.vue'),
     },
