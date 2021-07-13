@@ -24,26 +24,26 @@
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#business-title" type="button" @click="selectJoinType('business-title')"><span>기업 실명인증</span></button>
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#business-license" type="button" @click="selectJoinType('business-license')"><span>사업자등록증 업로드</span></button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#business-license" type="button" @click="selectJoinType('business-license')" :disabled="isInvited"><span>사업자등록증 업로드</span></button>
                     </div>
                 </nav>
                 <form @submit.prevent="join">
-                    <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-content" id="nav-content">
                         <div class="tab-pane show active" id="business-title">
                             <div class="mb-4">
                                 <label for="bsn-title" class="form-label mb-1">상호명</label>
-                                <input type="text" class="form-control" id="bsn-title" placeholder="티사이언티픽" v-model="bsnTitle" :disabled="isCertifiedBusiness">
+                                <input type="text" class="form-control" id="bsn-title" placeholder="티사이언티픽" v-model="bsnTitle" :disabled="isCertifiedBusiness || isInvited">
                             </div>
                             <div class="mb-4 position-relative">
                                 <label for="bsn-num" class="form-label mb-1">사업자등록번호</label>
-                                <input type="text" class="form-control" id="bsn-num" placeholder="220-81-54389" v-model="bsnNum" :disabled="isCertifiedBusiness">
-                                <button class="btn btn-sm position-absolute" @click.prevent="certBsnNum" :disabled="isCertifiedBusiness">사업자 실명인증</button>
+                                <input type="text" class="form-control" id="bsn-num" placeholder="220-81-54389" v-model="bsnNum" :disabled="isCertifiedBusiness || isInvited">
+                                <button class="btn btn-sm position-absolute" @click.prevent="certBsnNum" :disabled="isCertifiedBusiness || isInvited">사업자 실명인증</button>
                             </div>
                         </div>
                         <div class="tab-pane" id="business-license">
                             <div class="mb-4">
                                 <label for="bsn-file" class="form-label mb-1">사업자등록증(pdf, jpg)</label>
-                                <input type="file" class="form-control" id="bsn-file" placeholder="티사이언티픽" @input="selectBsnFile">
+                                <input type="file" class="form-control" id="bsn-file" placeholder="티사이언티픽" @input="selectBsnFile" :disabled="isInvited">
                             </div>
                         </div>
                     </div>
@@ -116,6 +116,8 @@ import { bootstrap }  from 'bootstrap';
                 pwConfirm: null,            // 비밀번호 확인
                 name: null,                 // 이름
                 mobile: null,               // 휴대폰번호
+                groupId: null,              // 그룹 아이디
+                groupName: null,            // 그룹 이름
                 isInvited: false,           // 기업관리자의 초대 여부
                 isCertifiedBusiness: false,      // 사업자 실명인증 여부
                 isCertifiedEmail: false,    // 이메일 인증 여부
@@ -131,6 +133,47 @@ import { bootstrap }  from 'bootstrap';
         computed: {
             certNumTimeLimitMinSec: function() {
                 return Math.floor(this.certNumTimeLimit / 60) + ':' + (this.certNumTimeLimit % 60 < 10 ? '0'+ this.certNumTimeLimit % 60 : this.certNumTimeLimit % 60);
+            }
+        },
+        mounted: function() {
+            // 초대 메일 유효성 검증
+            // console.log('this.$route.query.key => ', this.$route.query.key)
+            if (this.$route.query.key) {
+                axios({
+                    method: "POST",
+                    url: "https://tmall-backend.coufun.kr/invitations/auth",
+                    data: {
+                        "key": this.$route.query.key
+                    }
+                })
+                .then(res => {
+                    if (res.status == 200 || res.status == 204) {
+                        // console.log(res)
+                        this.isInvited = true;
+                        this.isCertifiedBusiness = true;
+                        this.bsnTitle = res.data.companyName;
+                        this.bsnNum = res.data.companyRegnum;
+                        this.groupId = res.data.groupId;
+                        this.groupName = res.data.groupName;
+                    } else {
+                        const err = new Error();
+                        err.response = res;
+                        throw err;
+                    }
+                })
+                .catch(err => {
+                    if (err &&
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.status &&
+                        err.response.data.status == 400) {
+                        alert(`${err.response.data.message}`);
+                        this.$router.replace('/')
+                        return;
+                    }
+                    alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                    this.$router.replace('/')
+                })
             }
         },
         methods: {
@@ -347,48 +390,87 @@ import { bootstrap }  from 'bootstrap';
                     return;
                 }
 
-                var formData = new FormData();
-                if (this.joinType == 'business-title') {
-                    formData.append("companyName", this.bsnTitle);
-                    formData.append("companyRegnum", this.bsnNum.replace(/[^\d]/ig, ""));
-                } else if (this.joinType == 'business-license') {
-                    formData.append("companyRegFile", this.bsnFile);
-                }
-                formData.append("emailId", this.email);
-                formData.append("mobileTelno", this.mobile.replace(/[^\d]/ig, ""));
-                formData.append("userName", this.name);
-                formData.append("userPwd", this.password);
+                if (this.isInvited) {
+                    // 가입절차 진행
+                    axios({
+                        method: 'post',
+                        url: 'https://tmall-backend.coufun.kr/sign-up/general',
+                        data: {
+                            "emailId": this.email,
+                            "groupId": this.groupId,
+                            "mobileTelno": this.mobile.replace(/[^\d]/ig, ""),
+                            "userName": this.name,
+                            "userPwd": this.password
+                        },
+                        headers: {
+                            "Content-Type": "application/json; charset=UTF-8"
+                        }
+                    })
+                    .then(res => {
+                        if (res.status == 200 || res.status == 204) {
+                            alert('회원가입이 완료되었습니다.');
+                            this.$router.push('/account/login');
+                        } else {
+                            const err = new Error();
+                            err.response = res;
+                            throw err;
+                        }
+                    })
+                    .catch(err => {
+                        if (err &&
+                            err.response &&
+                            err.response.data &&
+                            err.response.data.status &&
+                            err.response.data.status == 400) {
+                            alert(`${err.response.data.message}`);
+                            return;
+                        }
+                        alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                    })
+                } else {
+                    var formData = new FormData();
+                    if (this.joinType == 'business-title') {
+                        formData.append("companyName", this.bsnTitle);
+                        formData.append("companyRegnum", this.bsnNum.replace(/[^\d]/ig, ""));
+                    } else if (this.joinType == 'business-license') {
+                        formData.append("companyRegFile", this.bsnFile);
+                    }
+                    formData.append("emailId", this.email);
+                    formData.append("mobileTelno", this.mobile.replace(/[^\d]/ig, ""));
+                    formData.append("userName", this.name);
+                    formData.append("userPwd", this.password);
 
-                // 가입절차 진행
-                axios({
-                    method: 'post',
-                    url: 'https://tmall-backend.coufun.kr/sign-up/manager',
-                    data: formData,
-                    headers: {
-                        "Content-Type": "multipart/form-data; charset=UTF-8"
-                    }
-                })
-                .then(res => {
-                    if (res.status == 200 || res.status == 204) {
-                        alert('회원가입이 완료되었습니다.');
-                        this.$router.push('/account/login');
-                    } else {
-                        const err = new Error();
-                        err.response = res;
-                        throw err;
-                    }
-                })
-                .catch(err => {
-                    if (err &&
-                        err.response &&
-                        err.response.data &&
-                        err.response.data.status &&
-                        err.response.data.status == 400) {
-                        alert(`${err.response.data.message}`);
-                        return;
-                    }
-                    alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-                })
+                    // 가입절차 진행
+                    axios({
+                        method: 'post',
+                        url: 'https://tmall-backend.coufun.kr/sign-up/manager',
+                        data: formData,
+                        headers: {
+                            "Content-Type": "multipart/form-data; charset=UTF-8"
+                        }
+                    })
+                    .then(res => {
+                        if (res.status == 200 || res.status == 204) {
+                            alert('회원가입이 완료되었습니다.');
+                            this.$router.push('/account/login');
+                        } else {
+                            const err = new Error();
+                            err.response = res;
+                            throw err;
+                        }
+                    })
+                    .catch(err => {
+                        if (err &&
+                            err.response &&
+                            err.response.data &&
+                            err.response.data.status &&
+                            err.response.data.status == 400) {
+                            alert(`${err.response.data.message}`);
+                            return;
+                        }
+                        alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                    })
+                }
             }
         }
     }
