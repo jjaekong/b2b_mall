@@ -15,7 +15,25 @@ export default {
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 $grid-gutter-width: 4px;
+$position-values: (
+  0: 0,
+  10: 10%,
+  20: 20%,
+  25: 25%,
+  30: 30%,
+  40: 40%,
+  50: 50%,
+  60: 60%,
+  70: 70%,
+  75: 75%,
+  80: 80%,
+  90: 90%,
+  100: 100%
+);
 @import "~bootstrap/scss/bootstrap";
+:root {
+    --navbar-height: 50px;
+}
 body {
     font-family: "NanumSquareRound", sans-serif; // 300, 400, 700, 800
     font-size: 12px !important;
