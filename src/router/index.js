@@ -49,6 +49,7 @@ const routes = [
         component: () => import('../views/account/Join.vue')
     },
     {
+        name: 'reset_pw',
         path: '/account/reset_pw',
         component: () => import('../views/account/ResetPW.vue')
     },

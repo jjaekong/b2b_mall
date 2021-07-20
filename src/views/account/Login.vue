@@ -68,10 +68,11 @@ import axios from 'axios';
                                 name: 'wake_up',
                                 params: { userData: res.data }
                             })
-                        } else {    
+                        } else {
                             // 임시 비밀번호를 발급받은 사용자
                             if (res.data.temppwdYn == 'Y') {
-                                this.$router.push('/account/reset_pw');
+                                // this.$store.commit('setUserData', res.data);
+                                this.$router.push({ name: 'reset_pw', params: { userData: res.data } });
                             } else {
                                 // 2단계 인증 사용여부에 따라 페이지 이동
                                 if (res.data.towFactorAuthCode == "NONE") { // 사용안함: 메인페이지 이동

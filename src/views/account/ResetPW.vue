@@ -31,20 +31,28 @@
 
 <script>
 import axios from 'axios'
-import { mapState } from 'vuex'
+
     export default {
+        beforeRouteEnter(to, from, next) {
+            if (to.params.userData) {
+                next(vm => {
+                    vm.userData = to.params.userData;
+                });
+            } else {
+                next(vm => {
+                    vm.$router.replace("/account/login");
+                });
+            }
+        },
         components: {
             Header: () => import('@/components/Header.vue'),
         },
         data: function() {
             return {
-                
+                userData: null
             }
         },
         computed: {
-            ...mapState({
-                userData: state => state.userData
-            })
         },
         data: function() {
             return {
@@ -76,7 +84,6 @@ import { mapState } from 'vuex'
                     if (res.status == 200 || res.status == 204) {
                         // console.log('비번 재설정 성공', res)
                         alert('비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.');
-                        this.$store.commit('setUserData', null);
                         this.$router.push('/account/login');
                     } else {
                         const err = new Error();

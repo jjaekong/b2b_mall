@@ -24,6 +24,39 @@
                 </div>
             </div>
         </section>
+        <!-- 사용자 데이터 및 로그인 관련 메뉴 확인 영역 -->
+        <div class="container pt-4" v-if="userData">
+            <div class="card">
+                <div class="card-header">
+                    로그인 후
+                </div>
+                <div class="card-body">
+                    userData: {{userData}}
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><router-link :to="{ name: 'invite_user', params: { userData: userData } }">회원가입 초대</router-link></li>
+                        <li><router-link to="/account/login">회원정보 수정</router-link></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container pt-4" v-else>
+            <div class="card">
+                <div class="card-header">
+                    로그인 전
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><router-link to="/account/login">로그인</router-link></li>
+                        <li><router-link to="/account/find_id">아이디 찾기</router-link></li>
+                        <li><router-link to="/account/find_pw">비밀번호 찾기</router-link></li>
+                        <li><router-link to="/account/join">회원가입</router-link></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- // 사용자 데이터 및 로그인 관련 메뉴 확인 영역 -->
         <component :is="userData ? 'HomeWithUser' : 'HomeWithoutUser'" />
         <Navbar />
     </div>
