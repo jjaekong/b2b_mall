@@ -7,7 +7,7 @@
                     <h4>고객님의 아이디 찾기가 완료되었습니다.</h4>
                     <dl class="d-flex mb-0 justify-content-center">
                         <dt>아이디</dt>
-                        <dd class="mb-0">{{$route.params.emailId}}</dd>
+                        <dd class="mb-0">{{maskedEmail}}</dd>
                     </dl>
                 </div>
                 <form @submit.prevent="login">
@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { maskEmail } from '@/util';
 import axios from 'axios';
 
     export default {
@@ -52,6 +53,11 @@ import axios from 'axios';
                 regExpEmail: /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i, // 이메일 정규식
                 email: null,
                 password: null,
+            }
+        },
+        computed: {
+            maskedEmail: function() {
+                return maskEmail(this.$route.params.emailId)
             }
         },
         methods: {

@@ -1,4 +1,5 @@
 <template>
+    <div>
         <nav id="navbar">
             <router-link to="/">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
@@ -37,7 +38,7 @@
                 </svg>
                 <span>마이페이지</span>
             </router-link>
-            <router-link to="/more">
+            <a href="#" @click.prevent="toggleMore">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
                     <g fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="7" cy="16" r="2" />
@@ -46,20 +47,35 @@
                     </g>
                 </svg>
                 <span>더보기</span>
-            </router-link>
+            </a>
         </nav>
-        <!-- <div class="modal" id="navbar-more" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content">
-                    <router-link to="/usage">이용안내</router-link>
-                    <a target="_blank" href="https://cs.tscientific.co.kr">온라인 고객센터</a>
-                </div>
+        <aside id="aside" :style="{ 'display': showAside ? 'block' : 'none' }" @click.prevent="closeMore">
+            <div class="aside-content">
+                <router-link to="/usage">이용안내</router-link>
+                <a target="_blank" href="https://cs.tscientific.co.kr">온라인 고객센터</a>
             </div>
-        </div> -->
+        </aside>
+    </div>
 </template>
 
 <script>
-    
+export default {
+    data: function() {
+        return {
+            showAside: false
+        }
+    },
+    methods: {
+        toggleMore: function() {
+            this.showAside = !this.showAside
+        },
+        closeMore: function($event) {
+            if ($event.target.getAttribute('id') == 'aside') {
+                this.showAside = false
+            }
+        }
+    }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -104,10 +120,20 @@
         }
     }
 }
-#navbar-more {
-    height: 100px;
-    top: auto;
+#aside {
+    z-index: 9000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: var(--navbar-height);
+    background: rgba(0, 0, 0, .2);
+    .aside-content {
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+        background: white;
+    }
     a {
         display: flex;
         align-items: center;

@@ -4,7 +4,7 @@
         <main>
             <div class="container py-4">
                 <div class="agree-area">
-                    <div class="form-check">
+                    <div class="form-check flex-wrap">
                         <input class="visually-hidden" type="checkbox" id="agree-terms" v-model="agreeTerms">
                         <label class="form-check-label" for="agree-terms">
                             <i class="bi bi-check-lg"></i>
@@ -12,7 +12,7 @@
                         </label>
                         <a href="#modal-terms" data-bs-toggle="modal">상세보기 ▶</a>
                     </div>
-                    <div class="form-check">
+                    <div class="form-check flex-wrap">
                         <input class="visually-hidden" type="checkbox" id="agree-privacy" v-model="agreePrivacy">
                         <label class="form-check-label" for="agree-privacy">
                             <i class="bi bi-check-lg"></i>
@@ -93,7 +93,7 @@
 
 <script>
 import axios from "axios";
-import { certBusiness } from '@/account';
+import { certBusiness } from '@/auth';
 import { bootstrap }  from 'bootstrap';
 
     export default {
@@ -496,7 +496,7 @@ import { bootstrap }  from 'bootstrap';
     label {
         display: flex;
         align-items: center;
-        margin-right: 10px;
+        margin-right: 5px;
         font-size: 14px;
         i {
             display: flex;

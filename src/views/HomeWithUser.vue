@@ -14,7 +14,7 @@
                                 <button class="btn btn-sm dropdown-toggle rounded-0" type="button" data-bs-toggle="dropdown">
                                     인기순
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#">인기순</a></li>
                                     <li><a class="dropdown-item" href="#">최신순</a></li>
                                 </ul>
@@ -84,7 +84,10 @@ export default {
             border: 1px solid #cdcdce;
         }
         .dropdown-menu {
-            top: 100%;
+            inset: auto !important;
+            right: 0 !important;
+            top: calc(100% + 2px) !important;
+            transform: none !important;
         }
     }
 }

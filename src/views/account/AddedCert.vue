@@ -6,11 +6,11 @@
                 <div class="guide" v-if="userData" style="word-break: keep-all">
                     <h4>인증번호를 입력하세요.</h4>
                     <div v-if="userData.towFactorAuthCode == 'EMAIL'">
-                        회원님의 이메일({{userData.emailId}})로 2단계 인증번호가 발송되었습니다.<br>
+                        회원님의 이메일({{maskedEmail}})로 2단계 인증번호가 발송되었습니다.<br>
                         인증번호를 입력하여 2단계 인증을 완료해주세요.
                     </div>
                     <div v-else-if="userData.towFactorAuthCode == 'MOBILE_PHONE'">
-                        회원님의 휴대폰 번호({{userData.mobileTelno}})로 2단계 인증번호가 발송되었습니다.<br>
+                        회원님의 휴대폰 번호({{maskedMobile}})로 2단계 인증번호가 발송되었습니다.<br>
                         인증번호를 입력하여 2단계 인증을 완료해주세요.
                     </div>
                 </div>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { maskEmail, maskMobile } from '@/util';
 import axios from 'axios'
 
     export default {
@@ -62,6 +63,12 @@ import axios from 'axios'
         computed: {
             certNumTimeLimitMinSec: function() {
                 return Math.floor(this.certNumTimeLimit / 60) + ':' + (this.certNumTimeLimit % 60 < 10 ? '0'+ this.certNumTimeLimit % 60 : this.certNumTimeLimit % 60);
+            },
+            maskedEmail: function() {
+                return maskEmail(this.userData.emailId);
+            },
+            maskedMobile: function() {
+                return maskMobile(this.userData.mobileTelno);
             }
         },
         mounted: function() {

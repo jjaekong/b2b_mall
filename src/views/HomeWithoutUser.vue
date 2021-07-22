@@ -80,7 +80,7 @@
                         </div>
                         <div class="col col-12">
                             <div class="benefit-item benefit-item-4">
-                                <div><div class="circle"></div></div>
+                                <div><div class="circle"><span>:)</span></div></div>
                                 <div>
                                     <div class="text">
                                         <h2>선구매 할인</h2>
@@ -267,6 +267,12 @@ export default {
         &.benefit-item-4 {
             .circle {
                 background: #8636ff;
+                span {
+                    font-family: 'Montserrat', sans-serif;
+                    font-size: 36px;
+                    color: white;
+                    transform: rotate(90deg) translate(-10px, -10px);
+                }
             }
         }
     }

@@ -36,7 +36,7 @@
                 <div class="card-body">
                     <ul class="mb-0">
                         <li><router-link :to="{ name: 'invite_user', params: { userData: userData } }">회원가입 초대</router-link></li>
-                        <li><router-link to="/account/login">회원정보 수정</router-link></li>
+                        <li><router-link to="/account/edit_user_info">회원정보 수정</router-link></li>
                     </ul>
                 </div>
             </div>
@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import { maskMobile } from '@/util';
 import { mapState } from 'vuex';
 
     export default {
@@ -80,7 +81,7 @@ import { mapState } from 'vuex';
         computed: {
             ...mapState({
                 userData: state => state.userData
-            })
+            }),
         },
         methods: {
         }
