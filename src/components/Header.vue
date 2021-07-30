@@ -21,7 +21,7 @@
 export default {
     props: {
         hasLeft: { type: Boolean, default: true },
-        title: { type: String, default: 'PICKA' },
+        title: { type: String, default: 'PIKA' },
         cols: { type: Array, default: () => [3, 6, 3] }
     },
     methods: {
